@@ -6,7 +6,7 @@
 //
 //================================================================================================================================
 
-package cn.easyar.samples.helloarqrcode;
+package com.ericsson.arqr;
 
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLConfig;
@@ -16,7 +16,6 @@ import javax.microedition.khronos.opengles.GL10;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
-import android.util.Log;
 import android.widget.Toast;
 
 import cn.easyar.Engine;

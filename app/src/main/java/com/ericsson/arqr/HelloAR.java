@@ -6,7 +6,7 @@
 //
 //================================================================================================================================
 
-package cn.easyar.samples.helloarqrcode;
+package com.ericsson.arqr;
 
 import java.util.ArrayList;
 import android.opengl.GLES20;

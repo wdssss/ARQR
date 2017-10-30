@@ -4,7 +4,7 @@ android {
     compileSdkVersion 23
     buildToolsVersion "23.0.1"
     defaultConfig {
-        applicationId "cn.easyar.samples.helloarqrcode"
+        applicationId "com.ericsson.arqr"
         minSdkVersion 14
         targetSdkVersion 23
         versionCode 1

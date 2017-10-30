@@ -6,12 +6,11 @@
 //
 //================================================================================================================================
 
-package cn.easyar.samples.helloarqrcode;
+package com.ericsson.arqr;
 
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -34,18 +33,18 @@ public class MainActivity extends AppCompatActivity
     *  1. login www.easyar.com
     *  2. create app with
     *      Name: HelloARQRCode
-    *      Package Name: cn.easyar.samples.helloarqrcode
+    *      Package Name: com.ericsson.arqr
     *  3. find the created item in the list and show key
     *  4. set key string bellow
     */
-    private static String key = "===PLEASE ENTER YOUR KEY HERE===";
+    private static String key = "bcUXO46ivzmqJRFa9lGLDhVt8hSC3hXA4jGCCjCUbGLCsKA1lk2wwkWZbl315tpbWi7MgAyg5EERY4V84CKlyJiEbavriAkcFxf2EtKUvBdrvW4M2o6hNFo48K2ExkVCWlkxdf70EO6uJz13HL6LHzGYHRJR2qEfP2hrB48tKqWXhZaRbUjDewjeIyGattY8pHyaKjDa";
     private GLView glView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(com.ericsson.arqr.R.layout.activity_main);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         if (!Engine.initialize(this, key)) {
@@ -57,7 +56,7 @@ public class MainActivity extends AppCompatActivity
         requestCameraPermission(new PermissionCallback() {
             @Override
             public void onSuccess() {
-                ((ViewGroup) findViewById(R.id.preview)).addView(glView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+                ((ViewGroup) findViewById(com.ericsson.arqr.R.id.preview)).addView(glView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
             }
 
             @Override
@@ -127,7 +126,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(com.ericsson.arqr.R.menu.menu_main, menu);
         return true;
     }
 
@@ -136,7 +135,7 @@ public class MainActivity extends AppCompatActivity
     {
         int id = item.getItemId();
 
-        if (id == R.id.action_settings) {
+        if (id == com.ericsson.arqr.R.id.action_settings) {
             return true;
         }
 

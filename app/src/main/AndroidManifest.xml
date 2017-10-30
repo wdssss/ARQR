@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="cn.easyar.samples.helloarqrcode" >
+    package="com.ericsson.arqr" >
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -10,7 +10,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="cn.easyar.samples.helloarqrcode.MainActivity"
+            android:name="com.ericsson.arqr.MainActivity"
             android:screenOrientation="unspecified"
             android:configChanges="orientation|keyboardHidden|screenSize|smallestScreenSize"
             android:label="@string/app_name" >
