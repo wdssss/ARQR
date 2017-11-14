@@ -16,6 +16,7 @@ import android.opengl.GLES20;
 import android.util.Log;
 import android.widget.Toast;
 
+import cn.easyar.Buffer;
 import cn.easyar.CameraCalibration;
 import cn.easyar.CameraDevice;
 import cn.easyar.CameraDeviceFocusMode;
@@ -23,6 +24,7 @@ import cn.easyar.CameraDeviceType;
 import cn.easyar.CameraFrameStreamer;
 import cn.easyar.Frame;
 import cn.easyar.FunctorOfVoidFromPointerOfTargetAndBool;
+import cn.easyar.Image;
 import cn.easyar.ImageTarget;
 import cn.easyar.ImageTracker;
 import cn.easyar.QRCodeScanner;
@@ -35,6 +37,7 @@ import cn.easyar.Vec2I;
 import cn.easyar.Vec4I;
 
 public class HelloAR {
+    public static final String TAG = "HelloAR";
     private CameraDevice camera;
     private CameraFrameStreamer streamer;
     private ArrayList<ImageTracker> trackers;
@@ -48,6 +51,7 @@ public class HelloAR {
     private int previous_qrcode_index = -1;
     private MessageAlerter onAlert;
     private Context context;
+    private ImageTracker tracker;
 
     public interface MessageAlerter {
         void invoke(String s);
@@ -142,9 +146,9 @@ public class HelloAR {
         loadFromJsonFile(tracker, "targets.json", "argame");
         loadFromJsonFile(tracker, "targets.json", "idback");
         loadFromJsonFile(tracker, "targets.json", "qrdemo");
-        Bitmap bm = QRUtil.createQRCodeBitmap("hack", 400, 400);
+       /* Bitmap bm = QRUtil.createQRCodeBitmap("hack", 400, 400);
         String path = QRUtil.saveInfo(context, "hack", bm);
-        loadFromPATH(tracker, path, "hack");
+        loadFromPATH(tracker, path, "hack");*/
         loadAllFromJsonFile(tracker, "targets2.json");
         loadFromImage(tracker, "namecard.jpg");
         trackers.add(tracker);
@@ -277,8 +281,19 @@ public class HelloAR {
 
             if (frame.index() != previous_qrcode_index) {
                 previous_qrcode_index = frame.index();
+                Log.i(TAG, "render: images: " + frame.images().size());
+
                 String text = frame.text();
                 if (text != null && !text.equals("")) {
+                    ImageTracker tracker = new ImageTracker();
+                    tracker.attachStreamer(streamer);
+                    Image image = frame.images().get(0);
+                    Buffer b = image.buffer();
+                    byte[] bytes = new byte[b.size()];
+                    b.copyTo(bytes, 0);
+                    String path = QRUtil.saveImage(context, text, bytes);
+                    loadFromPATH(tracker, path, text);
+                    trackers.add(tracker);
                     Log.i("HelloAR", "got qrcode: " + text);
                     onAlert.invoke("got qrcode: " + text);
                 }

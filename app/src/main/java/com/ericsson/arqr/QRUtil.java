@@ -30,6 +30,30 @@ public class QRUtil {
 
     public static final String TAG = "QRUtil";
 
+    public static String saveImage(Context context,String name,byte[] bytes ){
+        //通过context得到data/data/files文件夹路径
+        File file = new File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), name + ".png");
+        FileOutputStream fos = null;
+        try {
+            //向文件写入注册信息
+            fos = new FileOutputStream(file);
+            fos.write(bytes);
+            Log.i(TAG, "saveImage: " + file.getAbsolutePath());
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            return null;
+        } finally {
+            if (fos != null) {
+                try {
+                    fos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return file.getAbsolutePath();
+    }
+
     public static String saveInfo(Context context, String name, Bitmap bitmap) {
         //通过context得到data/data/files文件夹路径
         File file = new File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), name + ".png");
