@@ -6,6 +6,10 @@
       "name" : "argame"
     },
     {
+      "image" : "qr.jpg",
+      "name" : "qrdemo"
+    },
+    {
       "image" : "idback.jpg",
       "name" : "idback",
       "size" : [8.56, 5.4],

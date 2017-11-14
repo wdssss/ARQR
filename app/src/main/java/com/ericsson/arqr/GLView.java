@@ -31,7 +31,7 @@ public class GLView extends GLSurfaceView
         setEGLContextFactory(new ContextFactory());
         setEGLConfigChooser(new ConfigChooser());
 
-        helloAR = new HelloAR();
+        helloAR = new HelloAR(context);
         onAlert = new HelloAR.MessageAlerter() {
             @Override
             public void invoke(final String s) {

@@ -9,8 +9,12 @@
 package com.ericsson.arqr;
 
 import java.util.ArrayList;
+
+import android.content.Context;
+import android.graphics.Bitmap;
 import android.opengl.GLES20;
 import android.util.Log;
+import android.widget.Toast;
 
 import cn.easyar.CameraCalibration;
 import cn.easyar.CameraDevice;
@@ -30,8 +34,7 @@ import cn.easyar.TargetStatus;
 import cn.easyar.Vec2I;
 import cn.easyar.Vec4I;
 
-public class HelloAR
-{
+public class HelloAR {
     private CameraDevice camera;
     private CameraFrameStreamer streamer;
     private ArrayList<ImageTracker> trackers;
@@ -44,29 +47,28 @@ public class HelloAR
     private Vec4I viewport = new Vec4I(0, 0, 1280, 720);
     private int previous_qrcode_index = -1;
     private MessageAlerter onAlert;
+    private Context context;
 
-    public interface MessageAlerter
-    {
+    public interface MessageAlerter {
         void invoke(String s);
     }
 
-    public HelloAR()
-    {
+    public HelloAR(Context context) {
+        this.context = context;
         trackers = new ArrayList<ImageTracker>();
     }
 
-    private void loadFromImage(ImageTracker tracker, String path)
-    {
+    private void loadFromImage(ImageTracker tracker, String path) {
         ImageTarget target = new ImageTarget();
         String jstr = "{\n"
-            + "  \"images\" :\n"
-            + "  [\n"
-            + "    {\n"
-            + "      \"image\" : \"" + path + "\",\n"
-            + "      \"name\" : \"" + path.substring(0, path.indexOf(".")) + "\"\n"
-            + "    }\n"
-            + "  ]\n"
-            + "}";
+                + "  \"images\" :\n"
+                + "  [\n"
+                + "    {\n"
+                + "      \"image\" : \"" + path + "\",\n"
+                + "      \"name\" : \"" + path.substring(0, path.indexOf(".")) + "\"\n"
+                + "    }\n"
+                + "  ]\n"
+                + "}";
         target.setup(jstr, StorageType.Assets | StorageType.Json, "");
         tracker.loadTarget(target, new FunctorOfVoidFromPointerOfTargetAndBool() {
             @Override
@@ -76,8 +78,29 @@ public class HelloAR
         });
     }
 
-    private void loadFromJsonFile(ImageTracker tracker, String path, String targetname)
-    {
+
+    private void loadFromPATH(ImageTracker tracker, String path, String name) {
+        ImageTarget target = new ImageTarget();
+        String jstr = "{\n"
+                + "  \"images\" :\n"
+                + "  [\n"
+                + "    {\n"
+                + "      \"image\" : \"" + path + "\",\n"
+                + "      \"name\" : \"" + name + "\"\n"
+                + "    }\n"
+                + "  ]\n"
+                + "}";
+        target.setup(jstr, StorageType.Absolute | StorageType.Json, "");
+        tracker.loadTarget(target, new FunctorOfVoidFromPointerOfTargetAndBool() {
+            @Override
+            public void invoke(Target target, boolean status) {
+                Log.i("HelloAR", String.format("load target (%b): %s (%d)", status, target.name(), target.runtimeID()));
+            }
+        });
+    }
+
+
+    private void loadFromJsonFile(ImageTracker tracker, String path, String targetname) {
         ImageTarget target = new ImageTarget();
         target.setup(path, StorageType.Assets, targetname);
         tracker.loadTarget(target, new FunctorOfVoidFromPointerOfTargetAndBool() {
@@ -88,8 +111,7 @@ public class HelloAR
         });
     }
 
-    private void loadAllFromJsonFile(ImageTracker tracker, String path)
-    {
+    private void loadAllFromJsonFile(ImageTracker tracker, String path) {
         for (ImageTarget target : ImageTarget.setupAll(path, StorageType.Assets)) {
             tracker.loadTarget(target, new FunctorOfVoidFromPointerOfTargetAndBool() {
                 @Override
@@ -100,8 +122,7 @@ public class HelloAR
         }
     }
 
-    public boolean initialize(MessageAlerter onAlert)
-    {
+    public boolean initialize(MessageAlerter onAlert) {
         camera = new CameraDevice();
         streamer = new CameraFrameStreamer();
         streamer.attachCamera(camera);
@@ -113,11 +134,17 @@ public class HelloAR
         status &= camera.open(CameraDeviceType.Default);
         camera.setSize(new Vec2I(1280, 720));
 
-        if (!status) { return status; }
+        if (!status) {
+            return status;
+        }
         ImageTracker tracker = new ImageTracker();
         tracker.attachStreamer(streamer);
         loadFromJsonFile(tracker, "targets.json", "argame");
         loadFromJsonFile(tracker, "targets.json", "idback");
+        loadFromJsonFile(tracker, "targets.json", "qrdemo");
+        Bitmap bm = QRUtil.createQRCodeBitmap("hack", 400, 400);
+        String path = QRUtil.saveInfo(context, "hack", bm);
+        loadFromPATH(tracker, path, "hack");
         loadAllFromJsonFile(tracker, "targets2.json");
         loadFromImage(tracker, "namecard.jpg");
         trackers.add(tracker);
@@ -125,8 +152,7 @@ public class HelloAR
         return status;
     }
 
-    public void dispose()
-    {
+    public void dispose() {
         for (ImageTracker tracker : trackers) {
             tracker.dispose();
         }
@@ -150,8 +176,7 @@ public class HelloAR
         }
     }
 
-    public boolean start()
-    {
+    public boolean start() {
         boolean status = true;
         status &= (camera != null) && camera.start();
         status &= (streamer != null) && streamer.start();
@@ -163,8 +188,7 @@ public class HelloAR
         return status;
     }
 
-    public boolean stop()
-    {
+    public boolean stop() {
         boolean status = true;
         for (ImageTracker tracker : trackers) {
             status &= tracker.stop();
@@ -175,8 +199,7 @@ public class HelloAR
         return status;
     }
 
-    public void initGL()
-    {
+    public void initGL() {
         if (videobg_renderer != null) {
             videobg_renderer.dispose();
         }
@@ -185,14 +208,12 @@ public class HelloAR
         box_renderer.init();
     }
 
-    public void resizeGL(int width, int height)
-    {
+    public void resizeGL(int width, int height) {
         view_size = new Vec2I(width, height);
         viewport_changed = true;
     }
 
-    private void updateViewport()
-    {
+    private void updateViewport() {
         CameraCalibration calib = camera != null ? camera.cameraCalibration() : null;
         int rotation = calib != null ? calib.rotation() : 0;
         if (rotation != this.rotation) {
@@ -216,8 +237,7 @@ public class HelloAR
         }
     }
 
-    public void render()
-    {
+    public void render() {
         GLES20.glClearColor(1.f, 1.f, 1.f, 1.f);
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
 
@@ -229,7 +249,9 @@ public class HelloAR
             }
         }
 
-        if (streamer == null) { return; }
+        if (streamer == null) {
+            return;
+        }
         Frame frame = streamer.peek();
         try {
             updateViewport();
@@ -243,7 +265,7 @@ public class HelloAR
                 int status = targetInstance.status();
                 if (status == TargetStatus.Tracked) {
                     Target target = targetInstance.target();
-                    ImageTarget imagetarget = target instanceof ImageTarget ? (ImageTarget)(target) : null;
+                    ImageTarget imagetarget = target instanceof ImageTarget ? (ImageTarget) (target) : null;
                     if (imagetarget == null) {
                         continue;
                     }
@@ -261,8 +283,7 @@ public class HelloAR
                     onAlert.invoke("got qrcode: " + text);
                 }
             }
-        }
-        finally {
+        } finally {
             frame.dispose();
         }
     }
